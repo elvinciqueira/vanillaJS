@@ -8,9 +8,9 @@ const progressContainer = document.querySelector('#progress-container');
 const title = document.querySelector('#title');
 const cover = document.querySelector('#cover');
 
-const songs = ['hey', 'summer', 'ukulele'];
+const songs = ['perfect', 'summer', 'glory', 'hey'];
 
-let songIndex = 1;
+let songIndex = 2;
 
 loadSong(songs[songIndex]);
 
@@ -39,6 +39,41 @@ function pauseSong() {
   audio.pause();
 }
 
+function prevSong() {
+  songIndex--;
+
+  if (songIndex < 0) songIndex = songs.length - 1;
+
+  loadSong(songs[songIndex]);
+
+  playSong();
+}
+
+function nextSong() {
+  songIndex++;
+
+  if (songIndex > songs.length - 1) songIndex = 0;
+
+  loadSong(songs[songIndex]);
+
+  playSong();
+}
+
+function setProgress(e) {
+  const width = this.clientWidth;
+  const clickX = e.offsetX;
+  const duration = audio.duration;
+
+  audio.currentTime = (clickX / width) * duration;
+}
+
+function updateProgress(e) {
+  const { duration, currentTime } = e.srcElement;
+  const progressPercent = (currentTime / duration) * 100;
+
+  progress.style.width = `${progressPercent}%`;
+}
+
 playBtn.addEventListener('click', () => {
   const isPlaying = musicContainer.classList.contains('play');
 
@@ -48,3 +83,11 @@ playBtn.addEventListener('click', () => {
     playSong();
   }
 });
+
+prevBtn.addEventListener('click', prevSong);
+nextBtn.addEventListener('click', nextSong);
+
+audio.addEventListener('timeupdate', updateProgress);
+audio.addEventListener('ended', nextSong);
+
+progressContainer.addEventListener('click', setProgress);
